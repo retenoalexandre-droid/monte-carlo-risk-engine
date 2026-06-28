@@ -1,4 +1,4 @@
-# 🎲 Moteur d'Audit de Risque Stochastique (Monte Carlo)
+#  Moteur d'Audit de Risque Stochastique (Monte Carlo)
 
 ## 1. Le Cas d'Usage (Business Case)
 Dans le cadre de la gestion des risques financiers, l'évaluation de la perte potentielle maximale d'un portefeuille ne peut se limiter à l'observation des rendements passés. Ce projet implémente un **Moteur de Monte Carlo** conçu pour simuler l'incertitude future. 
