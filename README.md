@@ -1,94 +1,30 @@
-ORDRE D'EXÉCUTION : MATRICE DE CORRÉLATION (Session de Demain, 17h00)Objectif : Aligner deux vecteurs financiers et calculer leur coefficient de corrélation linéaire ($\rho$) pour auditer la diversification du portefeuille.Contrainte de Temps : 45 minutes strictes.
-ÉTAPE 1 : ACQUISITION (0 - 10 min)
-Télécharge les deux fichiers CSV (ex: auto.csv et mine.csv).
-Assure-toi qu'ils couvrent la même période de temps.
-ÉTAPE 2 : INJECTION DU CODE MATRICIEL (10 - 25 min)
-Crée un nouveau script portfolio_risk.py et insère cette architecture :
-Pythonimport pandas as pd
+# 🎲 Moteur d'Audit de Risque Stochastique (Monte Carlo)
 
-# 1. Chargement des deux matrices (on utilise 'Date' comme index pour bien les aligner)
-df_auto = pd.read_csv('auto.csv', index_col='Date', parse_dates=True)
-df_mine = pd.read_csv('mine.csv', index_col='Date', parse_dates=True)
+## 1. Le Cas d'Usage (Business Case)
+Dans le cadre de la gestion des risques financiers, l'évaluation de la perte potentielle maximale d'un portefeuille ne peut se limiter à l'observation des rendements passés. Ce projet implémente un **Moteur de Monte Carlo** conçu pour simuler l'incertitude future. 
 
-# 2. Création de la matrice "Portefeuille" (Fusion des deux vecteurs de prix)
-portefeuille = pd.DataFrame({
-    'Automobile': df_auto['Close'], 
-    'Mine': df_mine['Close']
-})
+L'objectif est d'évaluer le risque extrême (*Tail Risk*) d'un portefeuille boursier diversifié (ex: Couverture industrielle via un actif Automobile et un actif Minier) sur un horizon de 30 jours, en extrayant des métriques réglementaires standard : la **Value at Risk (VaR)** et l'**Expected Shortfall (ES)**.
 
-# On supprime les lignes où il manque des données (jours fériés décalés, etc.)
-portefeuille = portefeuille.dropna()
+## 2. Architecture Mathématique et Financière
+Ce moteur ne repose pas sur des boucles itératives informatiques, mais sur la vectorisation matricielle d'équations probabilistes :
 
-# 3. Calcul des rendements pour toute la matrice en une seule ligne
-rendements = portefeuille.pct_change().dropna()
+* **Matrice de Covariance et Diversification :** Calcul du coefficient de corrélation linéaire de Pearson ($\rho$) entre les actifs pour auditer la réalité de la couverture de risque (neutralisation directionnelle).
+* **Processus Stochastique :** Génération de 10 000 trajectoires futures possibles ($N = 10 000$) sur un horizon temporel donné ($T = 30$). Les chocs quotidiens sont modélisés selon une distribution normale paramétrée sur la volatilité historique ($\sigma$) et l'espérance ($\mu$) du portefeuille.
+* **Extraction des Quantiles :** Isolat de la distribution finale simulée pour déterminer la ligne de démarcation du 5ème centile (VaR 95%) et calcul de l'espérance conditionnelle des pertes au-delà de ce seuil (Expected Shortfall).
 
-print("--- APERÇU DES RENDEMENTS DU PORTEFEUILLE ---")
-print(rendements.head())
+## 3. Stack Technique
+L'architecture est construite pour garantir des performances d'exécution instantanées sur de larges volumes de données :
+* **Python 3** : Langage cœur.
+* **NumPy** : Cœur du réacteur stochastique (génération de nombres pseudo-aléatoires et opérations sur les vecteurs finaux).
+* **Pandas** : Ingénierie des données temporelles, calculs de rendements vectorisés (`.pct_change()`) et matrices de corrélation (`.corr()`).
+* **Matplotlib** : Visualisation spatiale des trajectoires simulées (le "faisceau" de Monte Carlo) et de la distribution des risques.
+* **yfinance** : Connexion API pour l'extraction dynamique des données historiques du marché en temps réel, garantissant un modèle toujours à jour sans gestion de fichiers CSV statiques.
 
-# 4. LE CŒUR DU RÉACTEUR : La Matrice de Corrélation
-matrice_correlation = rendements.corr()
+## 4. Analyse Critique & Limites du Modèle (Reality Check)
+En ingénierie financière, la robustesse d'un modèle stochastique dépend intégralement de la qualité des données d'entrée (principe du *Garbage In, Garbage Out*).
 
-print("\n--- MATRICE DE CORRÉLATION DE PEARSON ---")
-print(matrice_correlation)
-ÉTAPE 3 : EXÉCUTION ET AUDIT D'ANALYSTE (25 - 45 min)Lance le script.La console va te sortir un tableau carré (une matrice $2 \times 2$).La diagonale sera composée de 1.000 (l'Automobile est parfaitement corrélée à 100% avec elle-même, logique).Ta vraie cible : Regarde le chiffre hors de la diagonale. S'il est proche de $0$, tes actifs sont indépendants. S'il est négatif, ta stratégie de couverture en fer a fonctionné de manière spectaculaire.ÉTAPE 4 : FERMETURE (Hard Stop)À la 45ème minute, coupure totale. Fermeture de VSCode.Quitte la Zone de Commandement.
+**Le Biais de l'Horizon Temporel :**
+Lors des premiers tests, le modèle a été alimenté avec un mois de données historiques situé en période de marché haussier (Bull Market). Le paramètre $\mu$ (espérance) artificiellement élevé a généré une VaR positive (illusion de l'absence de risque). 
 
-27/06/2026
-ORDRE D'EXÉCUTION : LE MOTEUR DE MONTE CARLO (Session de Demain, 17h00)
-Objectif : Utiliser les lois des probabilités pour simuler 10 000 trajectoires futures possibles sur 30 jours et visualiser l'incertitude de ton portefeuille imparfait.
-Contrainte de Temps : 45 minutes strictes.
-
-ÉTAPE 1 : IMPORTATION DU GÉNÉRATEUR ALÉATOIRE
-Nous allons avoir besoin d'une nouvelle bibliothèque mathématique : numpy. Elle est spécialisée dans les calculs matriciels complexes et la génération de hasard.
-En haut de ton script portfolio_risk.py, ajoute :
-
-Python
-import numpy as np
-import matplotlib.pyplot as plt
-ÉTAPE 2 : INJECTION DU MOTEUR STOCHASTIQUE
-À la suite de ton code d'hier (sous le print de la matrice de corrélation), insère cette architecture. Nous allons simuler un portefeuille composé à 50% d'Auto et 50% de Mine.
-
-Python
-print("\n--- INITIALISATION DU MOTEUR DE MONTE CARLO ---")
-
-# 1. Création du vecteur de rendement du portefeuille global (50/50)
-rendements_portefeuille = (rendements['Automobile'] * 0.5) + (rendements['Mine'] * 0.5)
-
-# 2. Paramétrage des probabilités (Loi Normale)
-mu = rendements_portefeuille.mean() # L'espérance (La tendance centrale)
-sigma = rendements_portefeuille.std() # L'écart-type (La volatilité globale)
-jours_a_simuler = 30
-nombre_de_scenarios = 10000
-
-print(f"Simulation de {nombre_de_scenarios} univers parallèles sur {jours_a_simuler} jours...")
-
-# 3. Le Cœur du Réacteur : La Génération Matricielle
-# On génère une matrice (30 lignes x 10000 colonnes) de tirages aléatoires normaux
-chocs_quotidiens = np.random.normal(mu, sigma, (jours_a_simuler, nombre_de_scenarios))
-
-# 4. Calcul des trajectoires (On part d'un capital de 100€)
-capital_initial = 100
-# La fonction cumprod() applique le mécanisme des intérêts composés sur chaque scénario
-trajectoires_prix = capital_initial * np.cumprod(1 + chocs_quotidiens, axis=0)
-
-# 5. Visualisation des Futurs (On n'affiche que 100 scénarios pour ne pas faire planter l'écran)
-plt.figure(figsize=(10, 6))
-plt.plot(trajectoires_prix[:, :100], alpha=0.5)
-plt.title("Monte Carlo : 100 Trajectoires Possibles du Portefeuille sur 30 Jours")
-plt.xlabel("Jours")
-plt.ylabel("Valeur du Portefeuille (€)")
-plt.axhline(y=capital_initial, color='black', linestyle='dashed', linewidth=2, label="Capital Initial (100€)")
-plt.legend()
-plt.show()
-ÉTAPE 3 : EXÉCUTION ET AUDIT VISUEL
-Lance le script.
-
-Observe le graphique. Tu ne verras plus une ligne du passé, mais un "faisceau" de lignes qui s'évase vers la droite, représentant tous les futurs possibles de tes 100 €.
-
-Certaines lignes s'envoleront, d'autres plongeront sous ton capital initial. C'est la matérialisation visuelle du hasard (le mouvement brownien).
-
-ÉTAPE 4 : FERMETURE (Hard Stop)
-À la 45ème minute, coupure totale.
-
-Fermeture de VSCode.
-
-Activation du repos passif.
+**La Correction Implémentée :**
+Pour modéliser le véritable risque systémique, le pipeline d'extraction API (`yfinance`) est désormais calibré pour aspirer **10 années de données historiques** (env. 2500 jours de bourse). Cette profondeur intègre mécaniquement les "Cygnes Noirs" macroéconomiques (krach de 2020, chocs d'inflation de 2022). Le paramètre $\sigma$ capture ainsi la véritable variance extrême, transformant ce modèle théorique en un outil d'audit de risque institutionnel réaliste, affichant la vulnérabilité réelle du portefeuille en cas de crise majeure.
