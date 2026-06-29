@@ -73,7 +73,7 @@ var_mc_95 = np.percentile(rendements_finaux, 5)
 
 print(f"Pire scénario attendu à 30 jours (VaR 95%) : {var_mc_95 * 100:.2f} %")
 
-# 4. (Bonus de l'Actuaire) L'Expected Shortfall de Monte Carlo
+# 4. L'Expected Shortfall de Monte Carlo
 # On isole les scénarios pires que la VaR et on fait la moyenne
 es_mc_95 = rendements_finaux[rendements_finaux <= var_mc_95].mean()
 print(f"Moyenne du crash en cas de crise extrême (ES 95%) : {es_mc_95 * 100:.2f} %")
