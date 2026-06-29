@@ -13,7 +13,6 @@ portefeuille = pd.DataFrame({
     'Mine': donnees_brutes['VALE']
 }).dropna()
 
-# --- LE RESTE DE TON CODE NE CHANGE PAS ---
 # 3. Calcul des rendements...
 rendements = portefeuille.pct_change().dropna()
 
