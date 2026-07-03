@@ -56,3 +56,34 @@ print(f"Ratio de Sharpe : {resultats[2, index_optimal]:.2f}")
 print("\nPondérations à appliquer :")
 for i in range(len(tickers)):
     print(f"- {tickers[i]} : {poids_optimaux[i]*100:.2f} %")
+
+print("\n--- GÉNÉRATION DE LA FRONTIÈRE EFFICIENTE (VISUALISATION) ---")
+
+# 1. Recalcul des deux points cardinaux (Index)
+idx_max_sharpe = np.argmax(resultats[2])
+idx_min_vol = np.argmin(resultats[0])
+
+# 2. Configuration de la toile spatiale
+plt.figure(figsize=(12, 8))
+
+# 3. Le Nuage de Points (Les 10 000 univers)
+# On multiplie par 100 pour afficher des pourcentages clairs
+# c=resultats[2] demande à Python de colorer les points selon leur Ratio de Sharpe (la "température" du profit)
+nuage = plt.scatter(resultats[0, :] * 100, resultats[1, :] * 100, c=resultats[2, :], cmap='viridis', marker='o', s=10, alpha=0.5)
+plt.colorbar(nuage, label='Ratio de Sharpe')
+
+# 4. Le Viseur Rouge : Le Portefeuille Optimal (Maximum Sharpe)
+plt.scatter(resultats[0, idx_max_sharpe] * 100, resultats[1, idx_max_sharpe] * 100, color='red', marker='*', s=400, edgecolor='black', label='Maximum Sharpe (Rendement Optimal)')
+
+# 5. Le Viseur Bleu : Le Bouclier Absolu (Minimum Variance)
+plt.scatter(resultats[0, idx_min_vol] * 100, resultats[1, idx_min_vol] * 100, color='blue', marker='*', s=400, edgecolor='black', label='Sécurité Absolue (Minimum Volatilité)')
+
+# 6. Esthétique, Titres et Grille de lecture
+plt.title("Frontière Efficiente de Markowitz (10 000 Portefeuilles Simulés)", fontsize=14, fontweight='bold')
+plt.xlabel("Risque : Volatilité Annualisée (%)", fontsize=12)
+plt.ylabel("Rendement Espéré Annualisé (%)", fontsize=12)
+plt.legend(loc='best', fontsize=11)
+plt.grid(True, linestyle='--', alpha=0.7)
+
+# Lancement de l'interface
+plt.show()
