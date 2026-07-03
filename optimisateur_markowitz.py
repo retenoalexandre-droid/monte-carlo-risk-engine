@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import yfinance as yf
+import datetime
 
 # 1. Sélection de 4 actifs totalement décorrélés pour maximiser l'efficacité
 # AAPL (Tech), GLD (Or), TLT (Obligations du Trésor), JPM (Banque)
@@ -56,6 +57,36 @@ print(f"Ratio de Sharpe : {resultats[2, index_optimal]:.2f}")
 print("\nPondérations à appliquer :")
 for i in range(len(tickers)):
     print(f"- {tickers[i]} : {poids_optimaux[i]*100:.2f} %")
+
+# --- EXPORT ETL : PRÉPARATION DU DATA MART ---
+print("\n--- EXPORT DES DONNÉES (MODE FORMAT LONG) ---")
+
+# 1. Restauration de la cible sur le Max Sharpe (si ce n'était pas déjà corrigé)
+index_optimal = np.argmax(resultats[2])
+poids_optimaux = poids_enregistres[index_optimal]
+
+# 2. Variables de contexte
+date_jour = datetime.datetime.now().strftime("%Y-%m-%d")
+type_opti = "Max_Sharpe"
+
+# 3. Création de la Table de Dimension (Allocation)
+# On structure la donnée verticalement pour faciliter la modélisation future
+lignes_dimension = []
+for i in range(len(tickers)):
+    lignes_dimension.append({
+        "Date_Calcul": date_jour,
+        "Type_Optimisation": type_opti,
+        "Ticker": tickers[i],
+        "Poids_Pct": round(poids_optimaux[i] * 100, 2)
+    })
+
+# 4. Conversion en DataFrame Pandas et Export Physique
+df_dimension = pd.DataFrame(lignes_dimension)
+
+# Export en CSV (le séparateur ';' évite les conflits avec les décimales européennes)
+df_dimension.to_csv("dim_allocation_actifs.csv", index=False, sep=';')
+
+print("Succès : La table 'dim_allocation_actifs.csv' a été gravée sur le disque.")
 
 print("\n--- GÉNÉRATION DE LA FRONTIÈRE EFFICIENTE (VISUALISATION) ---")
 
