@@ -34,10 +34,10 @@ Pour visualiser le tableau de bord interactif sur votre machine locale, une comm
 ```bash
 pip install streamlit pandas
 
-**Lancement du Serveur Local** :
+Lancement du Serveur Local :
 *Depuis la racine du projet (dans le terminal), exécutez la commande suivante (ne pas utiliser de lancement de script standard) :
 
 ```Bash
 python3 -m streamlit run dashboard.py
 
-Pour quitter le serveur local Streamlit qui tourne actuellement, tu dois d abord appuyer sur Control + C dans le terminal..
+Pour quitter le serveur local Streamlit qui tourne actuellement, vous devriez d abord appuyer sur Control + C dans le terminal.
