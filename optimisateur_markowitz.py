@@ -87,8 +87,10 @@ df_dimension = pd.DataFrame(lignes_dimension)
 # Export en CSV (le séparateur ';' évite les conflits avec les décimales européennes)
 fichier_dim = "dim_allocation_actifs.csv"
 entete = not os.path.exists(fichier_dim)
-df_dimension.to_csv(fichier_dim, mode='a', header=entete, index=False, sep=';')
-print("Succès : La table 'dim_allocation_actifs.csv' a été gravée sur le disque.")
+# Conversion en DataFrame Pandas et Export Physique (Mode Snapshot)
+df_dimension = pd.DataFrame(lignes_dimension)
+df_dimension.to_csv("dim_allocation_actifs.csv", index=False, sep=';')
+print("Succès : La table 'dim_allocation_actifs.csv' a été mise à jour (Snapshot).")
 
 print("\n--- GÉNÉRATION DE LA FRONTIÈRE EFFICIENTE (VISUALISATION) ---")
 
