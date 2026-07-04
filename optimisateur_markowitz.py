@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import yfinance as yf
 import datetime
+import os
 
 # 1. Sélection de 4 actifs totalement décorrélés pour maximiser l'efficacité
 # AAPL (Tech), GLD (Or), TLT (Obligations du Trésor), JPM (Banque)
@@ -84,8 +85,9 @@ for i in range(len(tickers)):
 df_dimension = pd.DataFrame(lignes_dimension)
 
 # Export en CSV (le séparateur ';' évite les conflits avec les décimales européennes)
-df_dimension.to_csv("dim_allocation_actifs.csv", index=False, sep=';')
-
+fichier_dim = "dim_allocation_actifs.csv"
+entete = not os.path.exists(fichier_dim)
+df_dimension.to_csv(fichier_dim, mode='a', header=entete, index=False, sep=';')
 print("Succès : La table 'dim_allocation_actifs.csv' a été gravée sur le disque.")
 
 print("\n--- GÉNÉRATION DE LA FRONTIÈRE EFFICIENTE (VISUALISATION) ---")
