@@ -1,5 +1,34 @@
 import streamlit as st
 import pandas as pd
+import matplotlib.pyplot as plt 
+
+# 0,5. extractation des donnees de distribution_stochastique.csv
+
+try:
+    df_distribution = pd.read_csv("distribution_stochastique.csv", sep= ";")
+
+except FileNotFoundError:
+    st.error("Le Fichier n'existe pas, veillez d'abord lancer portfolio_risk.py")
+    st.stop()
+
+# rajouter juste le bouton qui slide
+
+seuil_confiance = st.slider(label="Niveau de confiance", min_value=90, max_value=99, value=95, step=1, format="%d%%", help="Sélectionnez le niveau de confiance", label_visibility="visible")
+
+st.write(f"Le niveau de confiance est : {seuil_confiance}%")
+
+#Calcul de la var dynamique
+
+rendements = df_distribution['Rendement']
+reste_decimal_seuil_confiance = (100 - seuil_confiance)/100
+var_dynamique=rendements.quantile(reste_decimal_seuil_confiance)
+
+
+st.write(f"la Value At Risk dynamique est : {abs(var_dynamique*100): .2f} %")
+
+es_dynamique = rendements[rendements <= var_dynamique].mean()
+
+st.write(f"L'Expected Shortfall dynamique est : {abs(es_dynamique*100): .2f} %")
 
 # 1. Configuration de la page
 st.set_page_config(page_title="Risk Dashboard", layout="wide")
@@ -28,8 +57,8 @@ try:
     # Création de 3 colonnes pour afficher les KPIs à la manière d'un terminal Bloomberg
     col1, col2, col3 = st.columns(3)
     
-    col1.metric("Value at Risk (95%)", f"{derniere_ligne['Value_at_Risk_95_Pct']} %")
-    col2.metric("Expected Shortfall", f"{derniere_ligne['Expected_Shortfall_Pct']} %")
+    col1.metric("Value at Risk (95%)", f"{-derniere_ligne['Value_at_Risk_95_Pct']} %")
+    col2.metric("Expected Shortfall", f"{-derniere_ligne['Expected_Shortfall_Pct']} %")
     col3.metric("Volatilité Journalière", f"{derniere_ligne['Volatilite_Journaliere_Pct']} %")
 
     st.markdown("---")
@@ -47,3 +76,15 @@ try:
 
 except FileNotFoundError:
     st.error("Alerte : Les fichiers CSV sont introuvables. Le pipeline ETL doit être exécuté en amont.")
+
+#affichage graphique en cloche des differents rendements par rapport au montant initial
+
+initial_montant = 100
+#plt.plot (rendements * initial_montant)
+#plt.ylabel ('Affichage de la courbe de distribution en fonction des rendements')
+#plt.show()
+
+st.bar_chart(rendements * 100)
+
+
+

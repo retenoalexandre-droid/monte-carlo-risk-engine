@@ -88,3 +88,15 @@ entete = not os.path.exists(fichier_fait)
 df_fait.to_csv(fichier_fait, mode='a', header=entete, index=False, sep=';')
 
 print(f"Succès : Les métriques de risque ont été injectées dans la table '{fichier_fait}'.")
+
+#creer un fichier reunissant les 100000 trajectoires
+
+fait_trajectoire = {
+    "Rendement": rendements_finaux
+} 
+
+df_fait= pd.DataFrame(fait_trajectoire)
+
+fichier_trajectoire = "distribution_stochastique.csv"
+#entete = not os.path.exists(fichier_trajectoire)
+df_fait.to_csv(fichier_trajectoire, sep = ';')
