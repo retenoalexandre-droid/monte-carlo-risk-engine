@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt 
 
+
 # 0,5. extractation des donnees de distribution_stochastique.csv
 
 try:
@@ -79,12 +80,41 @@ except FileNotFoundError:
 
 #affichage graphique en cloche des differents rendements par rapport au montant initial
 
-initial_montant = 100
+#initial_montant = 100
 #plt.plot (rendements * initial_montant)
 #plt.ylabel ('Affichage de la courbe de distribution en fonction des rendements')
 #plt.show()
 
-st.bar_chart(rendements * 100)
+#st.bar_chart(rendements * 100)
+
+#Calcule de la moyenne et de l'ecart type de rendements
+
+#mu = rendements.mean()
+
+#sigma = rendements.std()
+
+#x = np.linspace(mu - 3 * sigma, mu + 3 * sigma, 200)
+#y = (1 / (sigma * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - mu) / sigma) ** 2)
+
+#df_normale = pd.DataFrame({'x': x, 'Densité': y}).set_index('x')
+
+#ax = df_normale.plot(kind="line", title="Mon graphique avec VaR visible")
+
+#ax.axhline(x=var_dynamique, color="red", linestyle="-", linewidth=2, label="VaR dynamique")
+
+
+#st.line_chart(df_normale)
+
+#faire un histogramme de rendements
+
+fig, ax = plt.subplots()
+ax.hist(rendements, color = 'black', edgecolor='skyblue')
+ax.set_title("courbe de distribution")
+ax.axvline(x=var_dynamique, color="red", linestyle="-", linewidth=2, label="VaR dynamique")
+st.pyplot(fig)
+
+
+
 
 
 
